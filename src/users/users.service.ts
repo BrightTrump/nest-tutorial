@@ -53,5 +53,34 @@ export class UsersService {
     role: 'INTERN' | 'DESIGNER' | 'ENGINEER' | 'ADMIN';
   }) {
     const usersByHighestId = [...this.users].sort((a, b) => (b.id = a.id));
+    const newuser = {
+      id: usersByHighestId[0].id + 1,
+      ...user,
+    };
+    this.users.push(newuser);
+    return newuser;
+  }
+
+  updateUser(
+    id: number,
+    updatedUser: {
+      name?: string;
+      email?: string;
+      role?: 'INTERN' | 'DESIGNER' | 'ENGINEER' | 'ADMIN';
+    },
+  ) {
+    this.users = this.users.map((user) => {
+      if (user.id === id) {
+        return { ...user, ...updatedUser };
+      }
+      return user;
+    });
+    return this.getUser(id);
+  }
+
+  deleteUser(id: number) {
+    const deletedUser = this.getUser(id);
+    this.users = this.users.filter((user) => user.id !== id);
+    return deletedUser;
   }
 }
