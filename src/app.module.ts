@@ -5,6 +5,8 @@ import { UsersService } from './users/users.service';
 import { DatabaseModule } from './database/database.module';
 import { EmployeesModule } from './employees/employees.module';
 import { ConfigModule } from '@nestjs/config';
+import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
+import { APP_GUARD } from '@nestjs/core';
 
 @Module({
   imports: [
@@ -15,7 +17,13 @@ import { ConfigModule } from '@nestjs/config';
     AuthModule,
     DatabaseModule,
     EmployeesModule,
+    ThrottlerModule.forRoot([
+      {
+        ttl: 60000,
+        limit: 3,
+      },
+    ]),
   ],
-  providers: [UsersService],
+  providers: [UsersService, { provide: APP_GUARD, useClass: ThrottlerGuard }],
 })
 export class AppModule {}
