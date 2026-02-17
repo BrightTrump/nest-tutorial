@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { Prisma } from '@prisma/client';
 import { DatabaseService } from 'src/database/database.service';
 
@@ -16,7 +16,7 @@ export class EmployeesService {
           role,
         },
       });
-    return this.databaseService.employees.findMany({where:{role,}});
+    return this.databaseService.employees.findMany();
   }
 
   findOne(id: number) {
@@ -28,14 +28,34 @@ export class EmployeesService {
   }
 
   update(id: number, updateEmployeeDto: Prisma.EmployeesUpdateInput) {
-    return `This action updates a #${id} employee`;
+    return this.databaseService.employees
+      .update({
+        where: {
+          id,
+        },
+        data: updateEmployeeDto,
+      })
+      .catch((error) => {
+        if (error.code === 'P2025') {
+          // Prisma “record not found” error
+          throw new NotFoundException(`Employee with id ${id} not found`);
+        }
+        throw error;
+      });
   }
 
   remove(id: number) {
-    return this.databaseService.employees.delete({
-      where: {
-        id,
-      },
-    });
+    return this.databaseService.employees
+      .delete({
+        where: {
+          id,
+        },
+      })
+      .catch((error) => {
+        if (error.code === 'P2025') {
+          throw new NotFoundException(`Employee with id ${id} not found`);
+        }
+        throw error;
+      });
   }
 }
