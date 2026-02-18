@@ -36,6 +36,7 @@ export class InValidOTPException extends HttpException {
     );
   }
 }
+
 export class InSufficientFundException extends HttpException {
   constructor(message?: string) {
     super(
@@ -46,13 +47,15 @@ export class InSufficientFundException extends HttpException {
   }
 }
 
+export class ExceedStorageException extends HttpException {
+  constructor(message?: string) {
+    super(message || '', HttpStatus.INSUFFICIENT_STORAGE);
+  }
+}
+
 export class CatchErrorException {
   private readonly logger = new Logger(CatchErrorException.name);
   constructor(error: Error) {
-    // TODO handle properly if (error instanceof HttpException) {
-    //   // Handle TypeORM error
-    //   throw new DatabaseException(error);
-    // }
     throw error;
   }
 }
